@@ -23,7 +23,7 @@ runs:
        shell: cmd
        working-directory: ${{ github.action_path }}
      - name: Invoke Action
-       run: docker run blob-storage-upload-artifact:latest --name ${{ inputs.name }} --connection-string ${{ inputs.connection-string }} --path ${{ inputs.path }}
+       run: docker run -v ${{ inputs.path }}:/data  blob-storage-upload-artifact:latest --name ${{ inputs.name }} --connection-string ${{ inputs.connection-string }} --path /data
        shell: cmd
 #    - run: dotnet run --project ${{ github.action_path }}/src/EAVFW.Extensions.GitHub.BlobStorageUploadArtifact.csproj --name ${{ inputs.name }} --connection-string ${{ inputs.connection-string }} --path ${{ inputs.path }}
 #      if: runner.os == 'Windows'
