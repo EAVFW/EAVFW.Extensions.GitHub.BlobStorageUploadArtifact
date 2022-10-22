@@ -128,8 +128,15 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
             var storage = new BlobServiceClient(ConnectionString.GetValue(parseResult));
             var name = NameOption.Replace("\\","/");
             var containerName = name.Split("/").First() ?? "github-action-artifacts";
+        
             var basePath = string.Join("/", name.Split('/').Skip(1));
-            
+           
+            if (containerName.Length < 3)
+            {
+                containerName = "github-action-artifacts";
+                basePath = name;
+            }
+
             var container = storage.GetBlobContainerClient(containerName);
             await container.CreateIfNotExistsAsync();
 
