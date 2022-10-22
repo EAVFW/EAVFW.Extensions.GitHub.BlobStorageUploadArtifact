@@ -129,11 +129,15 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
             var name = NameOption.Replace("\\","/");
             var containerName = name.Split("/").First() ?? "github-action-artifacts";
             var basePath = string.Join("/", name.Split('/').Skip(1));
+            
             var container = storage.GetBlobContainerClient(containerName);
+            await container.CreateIfNotExistsAsync();
 
             var runid = Environment.GetEnvironmentVariable("GITHUB_RUN_ID");
 
             var destinationPath = $"{runid}/{basePath.Trim('/')}";
+            console.WriteLine($"Uploading to {destinationPath}");
+
             var currentFolder = Directory.GetCurrentDirectory().Replace("\\", "/");
 
             async Task<int> Upload(IEnumerable<string> paths)
