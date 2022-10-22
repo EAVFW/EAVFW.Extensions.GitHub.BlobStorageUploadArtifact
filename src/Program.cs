@@ -54,6 +54,8 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
                     foreach (var a in aliass.Skip(1))
                         op.AddAlias(a.Alias);
                     o[prop.Name] = op;
+
+                    command.Add(op);
                 }
             }
 
