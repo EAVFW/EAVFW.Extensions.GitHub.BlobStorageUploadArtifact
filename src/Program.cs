@@ -123,7 +123,7 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
         }
         public async Task<int> Run(ParseResult parseResult, IConsole console)  
         {
-            console.WriteLine("Hello World");
+            console.WriteLine("Hello World 2");
 
             var storage = new BlobServiceClient(ConnectionString.GetValue(parseResult));
             var name = NameOption.Replace("\\","/");
@@ -135,7 +135,8 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
 
             var runid = Environment.GetEnvironmentVariable("GITHUB_RUN_ID");
 
-            var destinationPath = $"{runid}/{basePath.Trim('/')}";
+            var destinationPath = $"{runid}/{basePath.Trim('/')}"; 
+
             console.WriteLine($"Uploading to {destinationPath}");
 
             var currentFolder = Directory.GetCurrentDirectory().Replace("\\", "/");
