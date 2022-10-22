@@ -130,19 +130,20 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
             var containerName = name.Split("/").First() ?? "github-action-artifacts";
         
             var basePath = string.Join("/", name.Split('/').Skip(1));
-           
+            var runid = Environment.GetEnvironmentVariable("GITHUB_RUN_ID");
+            var destinationPath = $"artifacts/{basePath.Trim('/')}/runs/{runid}";
+
+
             if (containerName.Length < 3)
-            {
+            {   
+                destinationPath = $"{containerName}/artifacts/{basePath.Trim('/')}/runs/{runid}";
                 containerName = "github-action-artifacts";
-                basePath = name;
             }
 
             var container = storage.GetBlobContainerClient(containerName);
             await container.CreateIfNotExistsAsync();
 
-            var runid = Environment.GetEnvironmentVariable("GITHUB_RUN_ID");
-
-            var destinationPath = $"{runid}/{basePath.Trim('/')}"; 
+          
 
             console.WriteLine($"Uploading to {destinationPath}");
 
