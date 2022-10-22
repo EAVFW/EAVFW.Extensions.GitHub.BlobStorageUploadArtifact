@@ -14,13 +14,14 @@ inputs:
   path:
     description: 'Directory containing files to upload'
     required: true
+
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  args:
-  - '--name'
-  - ${{ inputs.name }}
-  - '--connection-string'
-  - ${{ inputs.connection-string }}
-  - '--path'
-  - ${{ inputs.path }}
+  using: "composite"
+  steps:
+     - name: Build Action
+       run: docker build -t blob-storage-upload-artifact:latest
+     - name: Invoke Action
+       run: docker run blob-storage-upload-artifact:latest --name ${{ inputs.name }} --connection-string ${{ inputs.connection-string }} --path ${{ inputs.path }}
+#    - run: dotnet run --project ${{ github.action_path }}/src/EAVFW.Extensions.GitHub.BlobStorageUploadArtifact.csproj --name ${{ inputs.name }} --connection-string ${{ inputs.connection-string }} --path ${{ inputs.path }}
+#      if: runner.os == 'Windows'
+ 
