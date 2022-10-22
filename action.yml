@@ -1,0 +1,26 @@
+﻿name: 'Upload a Build Artifact to Azure Blob Storage'
+description: 'Upload a build artifact that ca be used by subsequent workflow steps to Azure Blob Storage'
+author: 'eavfw'
+branding:
+  icon: 'sunrise'
+  color: 'orange'
+inputs:
+  connection-string:
+    description: 'Connection string'
+    required: true
+  name:
+    description: 'Artifact name'
+    required: true
+  path:
+    description: 'Directory containing files to upload'
+    required: true
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+  - '--name'
+  - ${{ inputs.name }}
+  - '--connection-string'
+  - ${{ inputs.connection-string }}
+  - '--path'
+  - ${{ inputs.path }}
