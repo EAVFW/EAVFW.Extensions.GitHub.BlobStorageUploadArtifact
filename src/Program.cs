@@ -93,12 +93,12 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
 
     }
 
-    public class UploadCommand : Command
-    {
-        public UploadCommand() : base("Upload", "Upload artifacts")
-        {
-        }
-    }
+    //public class UploadCommand : Command
+    //{
+    //    public UploadCommand() : base("Upload", "Upload artifacts")
+    //    {
+    //    }
+    //}
     public class App : System.CommandLine.RootCommand
     {
         [Alias("--name")]
@@ -173,9 +173,10 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
                 }
                 return 0;
             }
-
-
-            if (Path.Contains("*"))
+         
+            var path = Path.Replace("\\", "/");
+            console.WriteLine($"Finding files for {path}");
+            if (path.Contains("*"))
             {
 
                 var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
@@ -189,19 +190,19 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
               
             }
 
-            FileAttributes attr = File.GetAttributes(Path);
+            FileAttributes attr = File.GetAttributes(path);
 
             
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
             {
                 //Folder
-                return await Upload(Directory.GetFiles(Path).Select(c => c.Replace("\\", "/")).ToArray());
+                return await Upload(Directory.GetFiles(path).Select(c => c.Replace("\\", "/")).ToArray());
             }
 
             //File
 
 
-            return await Upload(new[] {Path.Replace("\\","/")});
+            return await Upload(new[] { path});
 
 
 
@@ -253,8 +254,8 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
                 .AddSingleton<ConsoleHostedService<App>>()
                 .AddHostedService(sp=>sp.GetRequiredService<ConsoleHostedService<App>>())
                 .AddSingleton<App>()
-                .AddSingleton<Command, UploadCommand>())
-                .Build();
+               // .AddSingleton<Command, UploadCommand>())
+                ).Build();
 
             var app = host.Services.GetRequiredService<ConsoleHostedService<App>>();
             await host.RunAsync();
