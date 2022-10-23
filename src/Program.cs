@@ -146,8 +146,10 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
           
 
             console.WriteLine($"Uploading to {destinationPath}");
-
-            var currentFolder = Directory.GetCurrentDirectory().Replace("\\", "/");
+          
+            var rootPath = Path.Replace("\\", "/").TrimEnd('/');
+            console.WriteLine($"Finding files for {rootPath}");
+            //   var currentFolder = Directory.GetCurrentDirectory().Replace("\\", "/");
 
             async Task<int> Upload(IEnumerable<string> paths)
             {
@@ -162,7 +164,7 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
                     using (var archive = new ZipArchive(await target.OpenWriteAsync(true), ZipArchiveMode.Create))
                     {
                         foreach (var path in paths) {
-                            var entry = archive.CreateEntry(path.Substring(currentFolder.Length + 1));
+                            var entry = archive.CreateEntry(path.Substring(rootPath.Length + 1));
 
                             using (var w = entry.Open())
                             {
@@ -180,16 +182,15 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
                     // Upload Single File
                     var path = paths.Single().Replace("\\", "/");
 
-                    var blob = container.GetBlobClient(destinationPath+"/"+ path.Substring(currentFolder.Length + 1));
+                    var blob = container.GetBlobClient(destinationPath+"/"+ path.Substring(rootPath.Length + 1));
 
                     await blob.UploadAsync(path);
                 }
                 return 0;
             }
          
-            var path = Path.Replace("\\", "/");
-            console.WriteLine($"Finding files for {path}");
-            if (path.Contains("*"))
+          
+            if (rootPath.Contains("*"))
             {
 
                 var matcher = new Matcher(StringComparison.OrdinalIgnoreCase);
@@ -203,19 +204,19 @@ namespace EAVFW.Extensions.GitHub.BlobStorageUploadArtifact
               
             }
 
-            FileAttributes attr = File.GetAttributes(path);
+            FileAttributes attr = File.GetAttributes(rootPath);
 
             
             if ((attr & FileAttributes.Directory) == FileAttributes.Directory)
             {
                 //Folder
-                return await Upload(Directory.GetFiles(path).Select(c => c.Replace("\\", "/")).ToArray());
+                return await Upload(Directory.GetFiles(rootPath,"*.*",SearchOption.AllDirectories).Select(c => c.Replace("\\", "/")).ToArray());
             }
 
             //File
 
 
-            return await Upload(new[] { path});
+            return await Upload(new[] { rootPath});
 
 
 
